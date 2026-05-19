@@ -36,7 +36,8 @@ export async function POST(req: NextRequest) {
     const token = await generateToken(vkUserId);
     await deletePending(vkUserId);
 
-    await vkSendMessage(vkUserId, `✨ Оплата подтверждена!\n\nВаш токен доступа:\n🔑 ${token}\n\nПерейдите на сайт и введите токен в поле «Токен доступа»:\n${SITE_URL}`);
+    await vkSendMessage(vkUserId, `✨ Оплата подтверждена!\n\nВаш токен доступа — в следующем сообщении. Скопируйте его и введите на сайте:\n${SITE_URL}`);
+    await vkSendMessage(vkUserId, token);
     await answerCallbackQuery(callbackQueryId, "✅ Токен выдан пользователю");
 
     if (chatId && messageId) {
