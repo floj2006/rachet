@@ -322,7 +322,7 @@ function ForecastContent() {
           <div className="space-y-4">
             {/* Rune of the year */}
             <InfoCard>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 mb-4">
                 <div className="shrink-0 w-16 h-16 card-mystic rounded-xl flex items-center justify-center">
                   <span className="section-rune text-gold-400">
                     {forecast.rune.symbol}
@@ -335,6 +335,17 @@ function ForecastContent() {
                   <p className="mb-2 text-cream-300 text-sm">{forecast.rune.meaning}</p>
                   <p>{forecast.rune.yearMeaning}</p>
                 </div>
+              </div>
+              <div className="divider-gold mb-4" />
+              <div className="space-y-3">
+                <Row label="Любовь и отношения" value={forecast.rune.love} />
+                <Row label="Финансы" value={forecast.rune.finance} />
+                <Row label="Энергия и здоровье" value={forecast.rune.health} />
+                <Row label="Ключевые моменты года" value={forecast.rune.keyMoments} />
+              </div>
+              <div className="mt-4 p-3 bg-gold-600/10 border border-gold-600/20 rounded-lg">
+                <span className="text-gold-400 font-semibold">Совет года: </span>
+                <span className="text-cream-200">{forecast.rune.advice}</span>
               </div>
             </InfoCard>
 

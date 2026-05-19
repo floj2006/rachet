@@ -42,6 +42,11 @@ export interface RuneContent {
   transliteration: string;
   meaning: string;
   yearMeaning: string;
+  love: string;
+  finance: string;
+  health: string;
+  keyMoments: string;
+  advice: string;
 }
 
 export interface ChineseContent {
