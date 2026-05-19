@@ -1,0 +1,19 @@
+import { NextRequest, NextResponse } from "next/server";
+import { verifyAndUseToken } from "@/lib/tokens";
+
+export async function POST(req: NextRequest) {
+  let token: string | undefined;
+  try {
+    const body = await req.json();
+    token = body.token;
+  } catch {
+    return NextResponse.json({ valid: false, error: "invalid request" }, { status: 400 });
+  }
+
+  if (!token || typeof token !== "string") {
+    return NextResponse.json({ valid: false, error: "token required" }, { status: 400 });
+  }
+
+  const valid = verifyAndUseToken(token);
+  return NextResponse.json({ valid });
+}

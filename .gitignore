@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# payment data (tokens, pending requests)
+/data/tokens.json
+/data/pending.json
