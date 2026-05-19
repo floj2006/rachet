@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mystic-950: #06030f;
+  --color-mystic-900: #0d0620;
+  --color-mystic-800: #160a35;
+  --color-mystic-700: #221050;
+  --color-gold-400: #e8c96b;
+  --color-gold-500: #c9a84c;
+  --color-gold-600: #9e7a2a;
+  --color-cream-100: #f5ead8;
+  --color-cream-200: #e8d5b0;
+  --color-cream-300: #d4b88a;
+  --color-purple-400: #a855f7;
+  --color-purple-500: #8b3fa8;
+  --color-purple-600: #6b2d8c;
+
+  --font-cinzel: "Cinzel", serif;
+  --font-cormorant: "Cormorant Garamond", serif;
+  --font-raleway: "Raleway", sans-serif;
+}
+
+:root {
+  --background: #06030f;
+  --foreground: #e8d5b0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-raleway), "Raleway", sans-serif;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(201, 168, 76, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(201, 168, 76, 0.6); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.glow-gold {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #c9a84c, #f5ead8, #c9a84c, #e8c96b, #c9a84c);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Star background is rendered by StarBackground canvas component */
+
+.card-mystic {
+  background: rgba(22, 10, 53, 0.6);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.card-mystic:hover {
+  border-color: rgba(201, 168, 76, 0.5);
+  background: rgba(22, 10, 53, 0.8);
+}
+
+.divider-gold {
+  background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+  height: 1px;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #c9a84c, #e8c96b, #c9a84c);
+  background-size: 200% auto;
+  transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.btn-gold:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201, 168, 76, 0.5);
+}
+
+.section-rune {
+  font-size: 4rem;
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(201, 168, 76, 0.8);
+}
