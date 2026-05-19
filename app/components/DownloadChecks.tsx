@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Star, Sparkles, Loader2 } from "lucide-react";
+import { Download, Star, Sparkles, Loader2, Smartphone } from "lucide-react";
 import type { ForecastData } from "../lib/types";
 import type { CheckInput } from "../lib/draw-check";
 import ZodiacIcon from "./ZodiacIcon";
+import { MONTHS } from "../lib/draw-wallpaper";
 
 interface Props {
   forecast: ForecastData;
@@ -13,6 +14,7 @@ interface Props {
 
 export default function DownloadChecks({ forecast, wealthNumber }: Props) {
   const [loading, setLoading] = useState<"universe" | "gratitude" | null>(null);
+  const [wallpaperLoading, setWallpaperLoading] = useState<number | null>(null);
 
   const input: CheckInput = {
     name: forecast.name,
@@ -23,6 +25,16 @@ export default function DownloadChecks({ forecast, wealthNumber }: Props) {
     forecastYear: forecast.forecastYear,
     wealthNumber,
   };
+
+  async function handleWallpaper(monthIndex: number) {
+    setWallpaperLoading(monthIndex);
+    try {
+      const { downloadWallpaper } = await import("../lib/draw-wallpaper");
+      await downloadWallpaper(monthIndex);
+    } finally {
+      setWallpaperLoading(null);
+    }
+  }
 
   async function handleDownload(type: "universe" | "gratitude") {
     setLoading(type);
@@ -115,6 +127,42 @@ export default function DownloadChecks({ forecast, wealthNumber }: Props) {
       <p className="text-center text-cream-300/40 text-xs mt-5">
         PDF генерируется в вашем браузере · Созвездие {forecast.sunSign.name} рисуется индивидуально
       </p>
+
+      <div className="divider-gold my-6" />
+
+      {/* Wallpapers */}
+      <div className="text-center mb-4">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <Smartphone size={20} className="text-gold-400" />
+          <h4
+            className="text-gold-400 font-semibold"
+            style={{ fontFamily: "var(--font-cinzel)" }}
+          >
+            Заставки на телефон
+          </h4>
+        </div>
+        <p className="text-cream-300 text-xs">Аффирмация и мантра на каждый месяц года</p>
+      </div>
+
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {MONTHS.map((month, i) => (
+          <button
+            key={i}
+            onClick={() => handleWallpaper(i)}
+            disabled={wallpaperLoading !== null}
+            className="card-mystic rounded-xl p-3 text-center hover:border-gold-400/50 border border-transparent transition-all disabled:opacity-60"
+          >
+            {wallpaperLoading === i ? (
+              <Loader2 size={16} className="animate-spin text-gold-400 mx-auto mb-1" />
+            ) : (
+              <span className="text-xl block mb-1">{month.icon}</span>
+            )}
+            <div className="text-gold-400 text-xs font-semibold" style={{ fontFamily: "var(--font-cinzel)" }}>
+              {month.name}
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

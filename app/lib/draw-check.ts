@@ -297,13 +297,7 @@ export function drawUniverseCheck(canvas: HTMLCanvasElement, input: CheckInput) 
   ctx.fillStyle = CREAM_DIM;
   ctx.fillText('СУММА К ПОЛУЧЕНИЮ', W / 2, 326);
 
-  const amounts = [
-    '777 777 777', '888 888 888', '999 999 999',
-    '1 111 111 111', '1 222 222 222', '1 333 333 333',
-    '444 444 444', '555 555 555', '666 666 666',
-    '111 111 111', '222 222 222',
-  ];
-  const amount = amounts[input.wealthNumber - 1] ?? '777 777 777';
+  const amount = '777 777 777';
 
   ctx.font = 'bold 56px "Cinzel", serif';
   ctx.fillStyle = GOLD;
