@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import { createPending, getPending } from "@/lib/tokens";
 import { vkSendMessage, vkGetUserName } from "@/lib/vk-api";
