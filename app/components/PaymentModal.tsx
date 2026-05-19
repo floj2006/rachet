@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Sparkles, Eye, Check, Loader2, Copy, ExternalLink, Key } from "lucide-react";
+import { X, Sparkles, Eye, Check, Loader2, ExternalLink, Key } from "lucide-react";
 
 interface Props {
   name: string;
@@ -18,7 +18,6 @@ const ITEMS = [
   "Сводный прогноз и благоприятные периоды",
 ];
 
-const CARD = process.env.NEXT_PUBLIC_PAYMENT_CARD ?? "0000 0000 0000 0000";
 const BANK = process.env.NEXT_PUBLIC_PAYMENT_BANK ?? "Сбербанк";
 const RECIPIENT = process.env.NEXT_PUBLIC_PAYMENT_NAME ?? "Иван И.";
 const SBP_PHONE = process.env.NEXT_PUBLIC_PAYMENT_SBP_PHONE ?? "";
@@ -31,14 +30,6 @@ export default function PaymentModal({ name, forecastYear, onSuccess, onClose }:
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
-
-  function copyCard() {
-    navigator.clipboard.writeText(CARD.replace(/\s/g, ""));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
   async function handleVerifyToken() {
     const trimmed = token.trim();
     if (!trimmed) { setError("Введите токен"); return; }
@@ -206,26 +197,10 @@ export default function PaymentModal({ name, forecastYear, onSuccess, onClose }:
                 <span className="text-cream-100">{RECIPIENT}</span>
               </div>
 
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-cream-300 shrink-0">Карта:</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-cream-100 font-mono tracking-widest">{CARD}</span>
-                  <button
-                    onClick={copyCard}
-                    className="text-gold-400 hover:text-gold-300 transition-colors"
-                    aria-label="Скопировать"
-                  >
-                    {copied ? <Check size={14} /> : <Copy size={14} />}
-                  </button>
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="text-cream-300">СБП / номер:</span>
+                <span className="text-cream-100 font-mono">{SBP_PHONE}</span>
               </div>
-
-              {SBP_PHONE && (
-                <div className="flex items-center justify-between">
-                  <span className="text-cream-300">СБП:</span>
-                  <span className="text-cream-100 font-mono">{SBP_PHONE}</span>
-                </div>
-              )}
 
               <p className="text-cream-300/70 text-xs text-center pt-1">
                 Укажите в комментарии: «Прогноз»
