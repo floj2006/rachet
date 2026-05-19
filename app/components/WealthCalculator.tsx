@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Coins, Sparkles, ChevronDown } from "lucide-react";
-import { getExpressionNumber, getLifePath } from "../lib/calculations";
+import { getExpressionNumber, getLifePath, getPersonalYear } from "../lib/calculations";
 
 const WEALTH_DATA: Record<number, { title: string; description: string; affirmation: string; color: string }> = {
   1: {
@@ -94,7 +94,7 @@ export default function WealthCalculator() {
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [birthYear, setBirthYear] = useState("");
-  const [result, setResult] = useState<{ wealthNumber: number; data: (typeof WEALTH_DATA)[number] } | null>(null);
+  const [result, setResult] = useState<{ wealthNumber: number; code: number[]; data: (typeof WEALTH_DATA)[number] } | null>(null);
   const [error, setError] = useState("");
 
   const currentYear = new Date().getFullYear();
@@ -107,16 +107,21 @@ export default function WealthCalculator() {
     if (!birthYear || isNaN(y) || y < 1900 || y > currentYear) { setError(`Год: 1900–${currentYear}`); return; }
 
     setError("");
-    const expr = getExpressionNumber(name.trim());
-    const lp = getLifePath(d, m, y);
-    // Wealth number = combination of expression + life path, reduced
-    function reduce(n: number): number {
-      if (n <= 9 || n === 11 || n === 22) return n;
-      return reduce(n.toString().split("").reduce((a, b) => a + parseInt(b), 0));
+
+    function toSingle(n: number): number {
+      if (n <= 9) return n === 0 ? 1 : n;
+      return toSingle(n.toString().split("").reduce((a, b) => a + parseInt(b), 0));
     }
-    const wn = reduce(expr + lp);
+
+    const lp   = toSingle(getLifePath(d, m, y));
+    const expr = toSingle(getExpressionNumber(name.trim()));
+    const py   = toSingle(getPersonalYear(d, m, currentYear));
+    const dn   = toSingle(d);
+
+    const code = [lp, expr, py, dn];
+    const wn = toSingle(lp + expr);
     const data = WEALTH_DATA[wn] ?? WEALTH_DATA[1];
-    setResult({ wealthNumber: wn, data });
+    setResult({ wealthNumber: wn, code, data });
   }
 
   return (
@@ -199,24 +204,25 @@ export default function WealthCalculator() {
           <div className="space-y-5">
             {/* Result */}
             <div className={`rounded-xl p-6 bg-gradient-to-br ${result.data.color} border border-gold-500/30`}>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-cream-300 text-xs mb-1">Число богатства</p>
-                  <div
-                    className="text-6xl font-bold text-gold-400"
-                    style={{ fontFamily: "var(--font-cinzel)" }}
-                  >
-                    {result.wealthNumber}
-                  </div>
+              <div className="mb-4 text-center">
+                <p className="text-cream-300 text-xs mb-2">Код богатства</p>
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  {result.code.map((digit, i) => (
+                    <div
+                      key={i}
+                      className="w-14 h-16 flex items-center justify-center rounded-xl border border-gold-500/50 bg-mystic-900/60 text-3xl font-bold text-gold-400"
+                      style={{ fontFamily: "var(--font-cinzel)" }}
+                    >
+                      {digit}
+                    </div>
+                  ))}
                 </div>
-                <div className="text-right">
-                  <p
-                    className="text-gold-400 font-semibold text-lg leading-tight"
-                    style={{ fontFamily: "var(--font-cinzel)" }}
-                  >
-                    {result.data.title}
-                  </p>
-                </div>
+                <p
+                  className="text-gold-400 font-semibold text-lg"
+                  style={{ fontFamily: "var(--font-cinzel)" }}
+                >
+                  {result.data.title}
+                </p>
               </div>
 
               <p
