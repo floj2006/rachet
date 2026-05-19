@@ -1,70 +1,36 @@
-import fs from "fs";
-import path from "path";
+import { Redis } from "@upstash/redis";
 import crypto from "crypto";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const TOKENS_FILE = path.join(DATA_DIR, "tokens.json");
-const PENDING_FILE = path.join(DATA_DIR, "pending.json");
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 type TokenRecord = { vkUserId: number; used: boolean; createdAt: string };
 type PendingRecord = { vkUserId: number; userName: string; requestedAt: string };
 
-function ensureDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+export async function createPending(vkUserId: number, userName: string): Promise<void> {
+  await redis.set(`pending:${vkUserId}`, { vkUserId, userName, requestedAt: new Date().toISOString() });
 }
 
-function readTokens(): Record<string, TokenRecord> {
-  ensureDir();
-  if (!fs.existsSync(TOKENS_FILE)) return {};
-  return JSON.parse(fs.readFileSync(TOKENS_FILE, "utf-8"));
+export async function getPending(vkUserId: number): Promise<PendingRecord | null> {
+  return await redis.get<PendingRecord>(`pending:${vkUserId}`);
 }
 
-function writeTokens(data: Record<string, TokenRecord>) {
-  ensureDir();
-  fs.writeFileSync(TOKENS_FILE, JSON.stringify(data, null, 2));
+export async function deletePending(vkUserId: number): Promise<void> {
+  await redis.del(`pending:${vkUserId}`);
 }
 
-function readPending(): Record<string, PendingRecord> {
-  ensureDir();
-  if (!fs.existsSync(PENDING_FILE)) return {};
-  return JSON.parse(fs.readFileSync(PENDING_FILE, "utf-8"));
-}
-
-function writePending(data: Record<string, PendingRecord>) {
-  ensureDir();
-  fs.writeFileSync(PENDING_FILE, JSON.stringify(data, null, 2));
-}
-
-export function createPending(vkUserId: number, userName: string): void {
-  const pending = readPending();
-  pending[String(vkUserId)] = { vkUserId, userName, requestedAt: new Date().toISOString() };
-  writePending(pending);
-}
-
-export function getPending(vkUserId: number): PendingRecord | null {
-  const pending = readPending();
-  return pending[String(vkUserId)] ?? null;
-}
-
-export function deletePending(vkUserId: number): void {
-  const pending = readPending();
-  delete pending[String(vkUserId)];
-  writePending(pending);
-}
-
-export function generateToken(vkUserId: number): string {
+export async function generateToken(vkUserId: number): Promise<string> {
   const token = crypto.randomBytes(12).toString("hex").toUpperCase();
-  const tokens = readTokens();
-  tokens[token] = { vkUserId, used: false, createdAt: new Date().toISOString() };
-  writeTokens(tokens);
+  await redis.set(`token:${token}`, { vkUserId, used: false, createdAt: new Date().toISOString() });
   return token;
 }
 
-export function verifyAndUseToken(token: string): boolean {
-  const tokens = readTokens();
-  const record = tokens[token.toUpperCase().trim()];
+export async function verifyAndUseToken(token: string): Promise<boolean> {
+  const key = `token:${token.toUpperCase().trim()}`;
+  const record = await redis.get<TokenRecord>(key);
   if (!record || record.used) return false;
-  tokens[token.toUpperCase().trim()].used = true;
-  writeTokens(tokens);
+  await redis.set(key, { ...record, used: true });
   return true;
 }

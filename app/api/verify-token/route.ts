@@ -9,13 +9,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     token = body.token;
   } catch {
-    return NextResponse.json({ valid: false, error: "invalid request" }, { status: 400 });
+    return NextResponse.json({ valid: false }, { status: 400 });
   }
 
   if (!token || typeof token !== "string") {
-    return NextResponse.json({ valid: false, error: "token required" }, { status: 400 });
+    return NextResponse.json({ valid: false }, { status: 400 });
   }
 
-  const valid = verifyAndUseToken(token);
+  const valid = await verifyAndUseToken(token);
   return NextResponse.json({ valid });
 }
